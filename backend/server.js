@@ -43,19 +43,19 @@ app.get('/api/health', (req, res) => {
 });
 
 // 1. PDF Parse Endpoint
-app.post('/api/parse-resume', upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded.' });
-    }
+// app.post('/api/parse-resume', upload.single('file'), async (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).json({ error: 'No file uploaded.' });
+//     }
 
-    const data = await pdf(req.file.buffer);
-    res.json({ text: data.text });
-  } catch (error) {
-    console.error('Error parsing PDF:', error);
-    res.status(500).json({ error: 'Failed to parse resume PDF. Make sure it is a valid text-based PDF.' });
-  }
-});
+//     const data = await pdf(req.file.buffer);
+//     res.json({ text: data.text });
+//   } catch (error) {
+//     console.error('Error parsing PDF:', error);
+//     res.status(500).json({ error: 'Failed to parse resume PDF. Make sure it is a valid text-based PDF.' });
+//   }
+// });
 
 // 2. ATS Analyzer Endpoint
 app.post('/api/analyze', async (req, res) => {
