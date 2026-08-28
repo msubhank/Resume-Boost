@@ -25,17 +25,17 @@ if (!apiKey) {
 }
 
 // Multer memory storage configuration for PDF upload
-// const upload = multer({
-//   storage: multer.memoryStorage(),
-//   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-//   fileFilter: (req, file, cb) => {
-//     if (file.mimetype === 'application/pdf') {
-//       cb(null, true);
-//     } else {
-//       cb(new Error('Only PDF files are supported!'), false);
-//     }
-//   }
-// });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are supported!'), false);
+    }
+  }
+});
 
 // Test route
 app.get('/api/health', (req, res) => {
