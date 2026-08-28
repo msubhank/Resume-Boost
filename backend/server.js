@@ -184,11 +184,11 @@ Optional Job Context (role or industry):
 });
 
 // Error handling middleware
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(500).json({ error: err.message || 'Something went wrong on the server.' });
-// });
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: err.message || 'Something went wrong on the server.' });
+});
 
-// app.listen(port, () => {
-//   console.log(`Server is running on port ${port}`);
-// });
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
