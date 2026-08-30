@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  Copy, 
-  Check, 
-  HelpCircle, 
-  Sparkles, 
-  MessageSquare, 
-  Award, 
-  CheckCircle2, 
+import {
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  Check,
+  HelpCircle,
+  Sparkles,
+  MessageSquare,
+  Award,
+  CheckCircle2,
   ListTodo
 } from 'lucide-react';
 
@@ -147,7 +147,7 @@ export function InterviewPrep({ questions, isLoading, onFetchQuestions, hasLoade
           </span>
         </div>
         <div className="w-full bg-gray-950 h-2 rounded-full overflow-hidden border border-gray-900/40">
-          <motion.div 
+          <motion.div
             className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${percentPracticed}%` }}
@@ -162,11 +162,10 @@ export function InterviewPrep({ questions, isLoading, onFetchQuestions, hasLoade
           <button
             key={option}
             onClick={() => setActiveFilter(option)}
-            className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
-              activeFilter === option
+            className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${activeFilter === option
                 ? 'bg-indigo-600/10 border-indigo-500/50 text-indigo-300'
                 : 'bg-gray-900/30 border-gray-900 text-gray-400 hover:text-gray-300 hover:border-gray-800'
-            }`}
+              }`}
           >
             {option === 'Resume-Gap' ? 'Resume Gaps' : option}
           </button>
@@ -186,27 +185,25 @@ export function InterviewPrep({ questions, isLoading, onFetchQuestions, hasLoade
             const isPracticed = !!practicedIds[actualIdx];
 
             return (
-              <div 
+              <div
                 key={actualIdx}
-                className={`border rounded-xl transition-all overflow-hidden ${
-                  isExpanded 
-                    ? 'border-indigo-500/40 bg-indigo-950/5' 
+                className={`border rounded-xl transition-all overflow-hidden ${isExpanded
+                    ? 'border-indigo-500/40 bg-indigo-950/5'
                     : 'border-gray-900 bg-[#0b0f19]/30 hover:border-gray-800'
-                }`}
+                  }`}
               >
                 {/* Header */}
-                <div 
+                <div
                   onClick={() => toggleExpand(actualIdx)}
                   className="p-4 flex items-start justify-between gap-4 cursor-pointer select-none"
                 >
                   <div className="flex gap-3 items-start flex-1">
                     <button
                       onClick={(e) => togglePracticed(actualIdx, e)}
-                      className={`mt-0.5 shrink-0 w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
-                        isPracticed
+                      className={`mt-0.5 shrink-0 w-5 h-5 rounded-full border flex items-center justify-center transition-all ${isPracticed
                           ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
                           : 'border-gray-700 hover:border-indigo-400 text-transparent'
-                      }`}
+                        }`}
                       title={isPracticed ? "Mark as unpracticed" : "Mark as practiced"}
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
@@ -214,13 +211,12 @@ export function InterviewPrep({ questions, isLoading, onFetchQuestions, hasLoade
 
                     <div className="space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
-                          q.type === 'Technical' 
+                        <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${q.type === 'Technical'
                             ? 'bg-blue-950/40 border border-blue-900/50 text-blue-300'
                             : q.type === 'Behavioral'
-                            ? 'bg-purple-950/40 border border-purple-900/50 text-purple-300'
-                            : 'bg-amber-950/40 border border-amber-900/50 text-amber-300'
-                        }`}>
+                              ? 'bg-purple-950/40 border border-purple-900/50 text-purple-300'
+                              : 'bg-amber-950/40 border border-amber-900/50 text-amber-300'
+                          }`}>
                           {q.type}
                         </span>
                         {isPracticed && (
@@ -251,7 +247,7 @@ export function InterviewPrep({ questions, isLoading, onFetchQuestions, hasLoade
                       className="overflow-hidden border-t border-gray-900/60"
                     >
                       <div className="p-4 space-y-4 text-xs leading-relaxed">
-                        
+
                         {/* Why Asked */}
                         <div className="bg-gray-900/10 border border-gray-950 p-3 rounded-lg">
                           <h5 className="font-bold text-gray-300 flex items-center gap-1.5 mb-1.5">
