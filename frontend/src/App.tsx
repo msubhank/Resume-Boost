@@ -10,11 +10,13 @@ import {
   Trash2,
   RefreshCw,
   Award,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { ScoreGauge } from './components/ScoreGauge';
 import { XYZRewriter } from './components/XYZRewriter';
+import { InterviewPrep, Question } from './components/InterviewPrep';
 
 interface AnalysisResult {
   score: number;
@@ -33,6 +35,12 @@ export default function App() {
   const [bullets, setBullets] = useState<string[]>([]);
   const [activeBullet, setActiveBullet] = useState('');
   const [error, setError] = useState('');
+
+  // Interview Prep Questions state
+  const [activeTab, setActiveTab] = useState<'optimizer' | 'interview'>('optimizer');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [hasLoadedQuestions, setHasLoadedQuestions] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -125,6 +133,10 @@ export default function App() {
     setAnalyzing(true);
     setError('');
     setAnalysisResult(null);
+    setQuestions([]);
+    setHasLoadedQuestions(false);
+    setLoadingQuestions(false);
+    setActiveTab('optimizer');
 
     try {
       const response = await fetch('http://localhost:5000/api/analyze', {
@@ -152,6 +164,38 @@ export default function App() {
     }
   };
 
+  const fetchQuestions = async () => {
+    if (!resumeText.trim() || !jobDescription.trim()) return;
+    setLoadingQuestions(true);
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:5000/api/generate-questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          resumeText,
+          jobDescription,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate interview questions. Verify backend server.');
+      }
+
+      const data = await response.json();
+      setQuestions(data.questions || []);
+      setHasLoadedQuestions(true);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Error generating interview questions.');
+    } finally {
+      setLoadingQuestions(false);
+    }
+  };
+
   const resetAll = () => {
     setResumeText('');
     setJobDescription('');
@@ -160,6 +204,10 @@ export default function App() {
     setBullets([]);
     setActiveBullet('');
     setError('');
+    setQuestions([]);
+    setLoadingQuestions(false);
+    setHasLoadedQuestions(false);
+    setActiveTab('optimizer');
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -444,52 +492,113 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Right Column: Google XYZ Bullet Rewriter (col-span-7) */}
+              {/* Right Column: Optimizer & Interview Prep Tabs (col-span-7) */}
               <div className="lg:col-span-7 flex flex-col gap-6">
-                <div className="glass-card rounded-2xl p-5">
-                  <h2 className="text-base font-bold text-white flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-indigo-400" />
-                    Google XYZ Bullet Point Optimizer
-                  </h2>
-                  <p className="text-xs text-gray-400 mb-5 leading-relaxed">
-                    Rewrite your accomplishments to showcase impact. Select a bullet point extracted from your uploaded resume below, or type your own directly.
-                  </p>
+                {/* Tab Switcher Headers */}
+                <div className="flex border border-gray-900 bg-[#0b0f19]/30 p-1.5 rounded-xl gap-2">
+                  <button
+                    onClick={() => setActiveTab('optimizer')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                      activeTab === 'optimizer'
+                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-950/40'
+                        : 'bg-transparent border-transparent text-gray-400 hover:text-gray-200'
+                    }`}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Bullet Point Optimizer
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('interview')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                      activeTab === 'interview'
+                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-950/40'
+                        : 'bg-transparent border-transparent text-gray-400 hover:text-gray-200'
+                    }`}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Interview Preparation
+                  </button>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    {/* Left: Extracted bullet points list if any (col-span-5) */}
-                    {bullets.length > 0 && (
-                      <div className="md:col-span-5 border-r border-gray-900/80 pr-2 flex flex-col max-h-[460px]">
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-2.5">
-                          Extracted from Resume
-                        </span>
-                        <div className="flex-1 overflow-y-auto space-y-2 pr-2">
-                          {bullets.map((bulletLine, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => setActiveBullet(bulletLine)}
-                              className={`w-full text-left p-2.5 text-[11px] rounded-lg border transition-all cursor-pointer leading-normal line-clamp-3 ${
-                                activeBullet === bulletLine
-                                  ? 'bg-indigo-950/20 border-indigo-500/40 text-indigo-300'
-                                  : 'bg-[#111827]/40 border-gray-800 text-gray-400 hover:text-gray-300 hover:border-gray-700'
-                              }`}
-                            >
-                              "{bulletLine}"
-                            </button>
-                          ))}
+                <AnimatePresence mode="wait">
+                  {activeTab === 'optimizer' ? (
+                    <motion.div
+                      key="optimizer-tab"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.15 }}
+                      className="glass-card rounded-2xl p-5"
+                    >
+                      <h2 className="text-base font-bold text-white flex items-center gap-2 mb-2">
+                        <Sparkles className="w-4 h-4 text-indigo-400" />
+                        Google XYZ Bullet Point Optimizer
+                      </h2>
+                      <p className="text-xs text-gray-400 mb-5 leading-relaxed">
+                        Rewrite your accomplishments to showcase impact. Select a bullet point extracted from your uploaded resume below, or type your own directly.
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                        {/* Left: Extracted bullet points list if any (col-span-5) */}
+                        {bullets.length > 0 && (
+                          <div className="md:col-span-5 border-r border-gray-900/80 pr-2 flex flex-col max-h-[460px]">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-2.5">
+                              Extracted from Resume
+                            </span>
+                            <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                              {bullets.map((bulletLine, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => setActiveBullet(bulletLine)}
+                                  className={`w-full text-left p-2.5 text-[11px] rounded-lg border transition-all cursor-pointer leading-normal line-clamp-3 ${
+                                    activeBullet === bulletLine
+                                      ? 'bg-indigo-950/20 border-indigo-500/40 text-indigo-300'
+                                      : 'bg-[#111827]/40 border-gray-800 text-gray-400 hover:text-gray-300 hover:border-gray-700'
+                                  }`}
+                                >
+                                  "{bulletLine}"
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Right: The optimizer tool (col-span-7 or 12 depending on bullets presence) */}
+                        <div className={bullets.length > 0 ? "md:col-span-7" : "md:col-span-12"}>
+                          <XYZRewriter 
+                            key={activeBullet}
+                            initialBullet={activeBullet}
+                            jobContext={jobDescription.slice(0, 100)} 
+                          />
                         </div>
                       </div>
-                    )}
-
-                    {/* Right: The optimizer tool (col-span-7 or 12 depending on bullets presence) */}
-                    <div className={bullets.length > 0 ? "md:col-span-7" : "md:col-span-12"}>
-                      <XYZRewriter 
-                        key={activeBullet}
-                        initialBullet={activeBullet}
-                        jobContext={jobDescription.slice(0, 100)} 
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="interview-tab"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.15 }}
+                      className="glass-card rounded-2xl p-5"
+                    >
+                      <h2 className="text-base font-bold text-white flex items-center gap-2 mb-2">
+                        <MessageSquare className="w-4 h-4 text-indigo-400" />
+                        AI Interview Questions Generator
+                      </h2>
+                      <p className="text-xs text-gray-400 mb-5 leading-relaxed">
+                        Prepare for your target job with tailored technical, behavioral, and resume-gap questions powered by Gemini.
+                      </p>
+                      
+                      <InterviewPrep 
+                        questions={questions}
+                        isLoading={loadingQuestions}
+                        onFetchQuestions={fetchQuestions}
+                        hasLoaded={hasLoadedQuestions}
                       />
-                    </div>
-                  </div>
-                </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
           )}

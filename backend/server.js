@@ -183,6 +183,84 @@ Optional Job Context (role or industry):
   }
 });
 
+// 4. Interview Prep Question Generator Endpoint
+app.post('/api/generate-questions', async (req, res) => {
+  try {
+    const { resumeText, jobDescription } = req.body;
+
+    if (!resumeText || !jobDescription) {
+      return res.status(400).json({ error: 'Both resumeText and jobDescription are required.' });
+    }
+
+    if (!ai) {
+      return res.status(503).json({ error: 'Gemini API is not configured on the backend.' });
+    }
+
+    const promptText = `
+Analyze the following resume against the job description to generate exactly 5 interview questions.
+The questions should consist of:
+- Technical questions (probing technical skills, system design, or engineering practices from the job description)
+- Behavioral questions (assessing teamwork, problem solving, conflict resolution)
+- Resume-Gap questions (addressing areas where the resume's skills or experience is thin compared to the JD, or clarifying specific details)
+
+For each question, provide:
+1. The question text.
+2. The question type (must be exactly 'Technical', 'Behavioral', or 'Resume-Gap').
+3. "Why Asked" explanation: Why an interviewer is likely to ask this question based on the resume and the job description.
+4. "Answer Strategy": Step-by-step guidance on how the user should structure their answer (e.g. using STAR method, key points to emphasize).
+5. "Sample Answer": A highly realistic, high-quality sample response tailored to the candidate's actual background/experience from the resume.
+
+Resume:
+"""
+${resumeText}
+"""
+
+Job Description:
+"""
+${jobDescription}
+"""
+`;
+
+    const responseSchema = {
+      type: 'OBJECT',
+      properties: {
+        questions: {
+          type: 'ARRAY',
+          items: {
+            type: 'OBJECT',
+            properties: {
+              question: { type: 'STRING' },
+              type: { type: 'STRING' }, // 'Technical', 'Behavioral', or 'Resume-Gap'
+              whyAsked: { type: 'STRING' },
+              answerStrategy: { type: 'STRING' },
+              sampleAnswer: { type: 'STRING' }
+            },
+            required: ['question', 'type', 'whyAsked', 'answerStrategy', 'sampleAnswer']
+          }
+        }
+      },
+      required: ['questions']
+    };
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.6-flash',
+      contents: promptText,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: responseSchema
+      }
+    });
+
+    const resultText = response.text;
+    const result = JSON.parse(resultText);
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error in /api/generate-questions:', error);
+    res.status(500).json({ error: 'An error occurred during interview question generation. Please try again.' });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
