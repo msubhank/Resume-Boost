@@ -38,9 +38,9 @@ const upload = multer({
 });
 
 // Test route
-// app.get('/api/health', (req, res) => {
-//   res.json({ status: 'ok', geminiActive: !!ai });
-// });
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', geminiActive: !!ai });
+});
 
 // 1. PDF Parse Endpoint
 app.post('/api/parse-resume', upload.single('file'), async (req, res) => {
