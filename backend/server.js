@@ -15,14 +15,14 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize Google Gemini API
-const apiKey = process.env.GEMINI_API_KEY;
-let ai = null;
+// const apiKey = process.env.GEMINI_API_KEY;
+// let ai = null;
 
-if (!apiKey) {
-  console.warn('WARNING: GEMINI_API_KEY is not defined in the environment variables. AI features will fail until it is added.');
-} else {
-  ai = new GoogleGenAI({ apiKey });
-}
+// if (!apiKey) {
+//   console.warn('WARNING: GEMINI_API_KEY is not defined in the environment variables. AI features will fail until it is added.');
+// } else {
+//   ai = new GoogleGenAI({ apiKey });
+// }
 
 // Multer memory storage configuration for PDF upload
 const upload = multer({
