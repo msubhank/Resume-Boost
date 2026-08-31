@@ -11,12 +11,14 @@ import {
   RefreshCw,
   Award,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Mail
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { ScoreGauge } from './components/ScoreGauge';
 import { XYZRewriter } from './components/XYZRewriter';
 import { InterviewPrep, Question } from './components/InterviewPrep';
+import { CoverLetterGenerator } from './components/CoverLetterGenerator';
 
 interface AnalysisResult {
   score: number;
@@ -36,8 +38,8 @@ export default function App() {
   const [activeBullet, setActiveBullet] = useState('');
   const [error, setError] = useState('');
 
-  // Interview Prep Questions state
-  const [activeTab, setActiveTab] = useState<'optimizer' | 'interview'>('optimizer');
+  // Tab state
+  const [activeTab, setActiveTab] = useState<'optimizer' | 'interview' | 'cover-letter'>('optimizer');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
   const [hasLoadedQuestions, setHasLoadedQuestions] = useState(false);
@@ -505,7 +507,7 @@ export default function App() {
                     }`}
                   >
                     <Sparkles className="w-4 h-4" />
-                    Bullet Point Optimizer
+                    <span className="hidden sm:inline">Bullet Point</span> Optimizer
                   </button>
                   <button
                     onClick={() => setActiveTab('interview')}
@@ -516,7 +518,18 @@ export default function App() {
                     }`}
                   >
                     <MessageSquare className="w-4 h-4" />
-                    Interview Preparation
+                    Interview Prep
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('cover-letter')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                      activeTab === 'cover-letter'
+                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-950/40'
+                        : 'bg-transparent border-transparent text-gray-400 hover:text-gray-200'
+                    }`}
+                  >
+                    <Mail className="w-4 h-4" />
+                    Cover Letter
                   </button>
                 </div>
 
@@ -573,7 +586,7 @@ export default function App() {
                         </div>
                       </div>
                     </motion.div>
-                  ) : (
+                  ) : activeTab === 'interview' ? (
                     <motion.div
                       key="interview-tab"
                       initial={{ opacity: 0, y: 10 }}
@@ -595,6 +608,28 @@ export default function App() {
                         isLoading={loadingQuestions}
                         onFetchQuestions={fetchQuestions}
                         hasLoaded={hasLoadedQuestions}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="cover-letter-tab"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.15 }}
+                      className="glass-card rounded-2xl p-5"
+                    >
+                      <h2 className="text-base font-bold text-white flex items-center gap-2 mb-2">
+                        <Mail className="w-4 h-4 text-indigo-400" />
+                        AI Tailored Cover Letter Generator
+                      </h2>
+                      <p className="text-xs text-gray-400 mb-5 leading-relaxed">
+                        Craft a high-converting, personalized cover letter tailored to the job description and your resume strengths.
+                      </p>
+
+                      <CoverLetterGenerator
+                        resumeText={resumeText}
+                        jobDescription={jobDescription}
                       />
                     </motion.div>
                   )}
