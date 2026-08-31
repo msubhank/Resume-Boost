@@ -163,8 +163,8 @@ export function InterviewPrep({ questions, isLoading, onFetchQuestions, hasLoade
             key={option}
             onClick={() => setActiveFilter(option)}
             className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${activeFilter === option
-                ? 'bg-indigo-600/10 border-indigo-500/50 text-indigo-300'
-                : 'bg-gray-900/30 border-gray-900 text-gray-400 hover:text-gray-300 hover:border-gray-800'
+              ? 'bg-indigo-600/10 border-indigo-500/50 text-indigo-300'
+              : 'bg-gray-900/30 border-gray-900 text-gray-400 hover:text-gray-300 hover:border-gray-800'
               }`}
           >
             {option === 'Resume-Gap' ? 'Resume Gaps' : option}
@@ -188,8 +188,8 @@ export function InterviewPrep({ questions, isLoading, onFetchQuestions, hasLoade
               <div
                 key={actualIdx}
                 className={`border rounded-xl transition-all overflow-hidden ${isExpanded
-                    ? 'border-indigo-500/40 bg-indigo-950/5'
-                    : 'border-gray-900 bg-[#0b0f19]/30 hover:border-gray-800'
+                  ? 'border-indigo-500/40 bg-indigo-950/5'
+                  : 'border-gray-900 bg-[#0b0f19]/30 hover:border-gray-800'
                   }`}
               >
                 {/* Header */}
@@ -201,8 +201,8 @@ export function InterviewPrep({ questions, isLoading, onFetchQuestions, hasLoade
                     <button
                       onClick={(e) => togglePracticed(actualIdx, e)}
                       className={`mt-0.5 shrink-0 w-5 h-5 rounded-full border flex items-center justify-center transition-all ${isPracticed
-                          ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                          : 'border-gray-700 hover:border-indigo-400 text-transparent'
+                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                        : 'border-gray-700 hover:border-indigo-400 text-transparent'
                         }`}
                       title={isPracticed ? "Mark as unpracticed" : "Mark as practiced"}
                     >
@@ -212,10 +212,10 @@ export function InterviewPrep({ questions, isLoading, onFetchQuestions, hasLoade
                     <div className="space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${q.type === 'Technical'
-                            ? 'bg-blue-950/40 border border-blue-900/50 text-blue-300'
-                            : q.type === 'Behavioral'
-                              ? 'bg-purple-950/40 border border-purple-900/50 text-purple-300'
-                              : 'bg-amber-950/40 border border-amber-900/50 text-amber-300'
+                          ? 'bg-blue-950/40 border border-blue-900/50 text-blue-300'
+                          : q.type === 'Behavioral'
+                            ? 'bg-purple-950/40 border border-purple-900/50 text-purple-300'
+                            : 'bg-amber-950/40 border border-amber-900/50 text-amber-300'
                           }`}>
                           {q.type}
                         </span>
