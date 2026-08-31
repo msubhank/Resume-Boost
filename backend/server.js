@@ -261,6 +261,87 @@ ${jobDescription}
   }
 });
 
+// 5. Tailored Cover Letter Generator Endpoint
+app.post('/api/generate-cover-letter', async (req, res) => {
+  try {
+    const { resumeText, jobDescription, tone = 'professional', companyName, hiringManager } = req.body;
+
+    if (!resumeText || !jobDescription) {
+      return res.status(400).json({ error: 'Both resumeText and jobDescription are required.' });
+    }
+
+    if (!ai) {
+      return res.status(503).json({ error: 'Gemini API is not configured on the backend.' });
+    }
+
+    const toneDescriptions = {
+      professional: 'Formal, polished, respectful, and authoritative tone suitable for enterprise and corporate roles.',
+      modern: 'Engaging, creative, dynamic, and forward-looking tone ideal for tech companies, startups, and agile environments.',
+      concise: 'Direct, brief, high-impact, and fluff-free. Focuses strictly on key quantifiable achievements in under 250 words.',
+      enthusiastic: 'Passionate, energetic, mission-driven, and expressive. Demonstrates deep excitement for the company culture and role.'
+    };
+
+    const chosenToneDesc = toneDescriptions[tone.toLowerCase()] || toneDescriptions.professional;
+
+    const promptText = `
+You are an expert executive career coach and professional copywriter.
+Generate a tailored, high-converting cover letter based on the provided resume and target job description.
+
+Tone Style: ${chosenToneDesc}
+Company Name: ${companyName ? companyName.trim() : 'the company mentioned in the job description or [Company Name]'}
+Hiring Manager / Recruiter: ${hiringManager ? hiringManager.trim() : 'Hiring Team'}
+
+Guidelines:
+1. Salutation: Address to "${hiringManager ? hiringManager.trim() : 'Hiring Team'}" or appropriate hiring committee.
+2. Opening: Create a compelling hook that immediately states the role, demonstrates interest in the company, and sets an engaging tone.
+3. Body Paragraphs (1-2 paragraphs): Synthesize the candidate's most relevant past accomplishments and quantifiable impact from the resume, mapping them directly to the key requirements of the job description.
+4. Closing: Confident call to action requesting an interview or conversation, with a professional sign-off.
+5. Provide a crisp, high-converting email subject line.
+6. Provide 3-4 bulleted key strengths or highlights from the resume that were woven into the letter.
+
+Resume:
+"""
+${resumeText}
+"""
+
+Job Description:
+"""
+${jobDescription}
+"""
+`;
+
+    const responseSchema = {
+      type: 'OBJECT',
+      properties: {
+        coverLetter: { type: 'STRING' },
+        subjectLine: { type: 'STRING' },
+        keyHighlights: {
+          type: 'ARRAY',
+          items: { type: 'STRING' }
+        }
+      },
+      required: ['coverLetter', 'subjectLine', 'keyHighlights']
+    };
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.6-flash',
+      contents: promptText,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: responseSchema
+      }
+    });
+
+    const resultText = response.text;
+    const result = JSON.parse(resultText);
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error in /api/generate-cover-letter:', error);
+    res.status(500).json({ error: 'An error occurred while generating the cover letter. Please try again.' });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
